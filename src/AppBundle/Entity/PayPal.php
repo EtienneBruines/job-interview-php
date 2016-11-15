@@ -157,6 +157,16 @@ class PayPal
         return $payment;
     }
 
+    /**
+     * Executes a payment in the PayPal environment
+     *
+     * @param $payment Payment The payment that will be executed
+     * @param $payerId string The PayerID as given by the request as a result of the authorization
+     *
+     * @throws \Exception if unable to execute the payment
+     *
+     * @return Payment The updated payment with PayPal-specific information
+     */
     public static function executePayment($payment, $payerId) {
         $token = self::getToken();
 
