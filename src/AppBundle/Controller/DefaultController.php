@@ -3,8 +3,10 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use AppBundle\Entity\Skill;
 
 class DefaultController extends Controller
 {
@@ -13,9 +15,52 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+        $skills = $em->getRepository("AppBundle:Skill")->findAll();
+
         // replace this example code with whatever you need
         return $this->render('default/index.html.twig', [
-            'base_dir' => realpath($this->getParameter('kernel.root_dir').'/..').DIRECTORY_SEPARATOR,
+                "skills" => $skills,
+            ]);
+    }
+
+    /**
+     * @Route("/initialize", name="init")
+     */
+    public function initAction()
+    {
+        $skill = new Skill();
+        $skill->setName('HTML Knowledge');
+        $skill->setPrice(19.95);
+
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($skill);
+        $em->flush();
+
+        return $this->redirectToRoute('homepage');
+    }
+
+    /**
+     * @Route("/purchase/{skillId}", name="purchase")
+     * @Method("GET")
+     */
+    public function purchaseAction($skillId) {
+        $em = $this->getDoctrine()->getManager();
+        $skill = $em->getRepository("AppBundle:Skill")->find($skillId);
+        return $this->render('default/purchase.html.twig', [
+            'skill' => $skill,
+        ]);
+    }
+
+    /**
+     * @Route("/purchase/{skillId}", name="purchase_confirmed")
+     * @Method("POST")
+     */
+    public function purchaseConfirmedAction($skillId) {
+        $em = $this->getDoctrine()->getManager();
+        $skill = $em->getRepository("AppBundle:Skill")->find($skillId);
+        return $this->render('default/purchase.html.twig', [
+            'skill' => $skill,
         ]);
     }
 }
