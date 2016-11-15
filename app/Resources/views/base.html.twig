@@ -14,14 +14,26 @@
   <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
 </head>
 <body>
-<header class="row column">
-  <h1><a href="{{ path('homepage') }}">Job Interview</a></h1>
+<header>
+  <div class="top-bar">
+    <div class="row column">
+    <div class="top-bar-title">
+      <h1><a href="{{ path('homepage') }}">Job Interview</a></h1>
+    </div>
+    <div class="top-bar-right">
+      <ul class="menu">
+        <li><a href="{{ path('homepage') }}" class="button"><i class="fi-shopping-bag"></i> Shop</a></li>
+        <li><a href="{{ path('purchase-history') }}" class="button secondary"><i class="fi-page-multiple"></i> Purchase History</a></li>
+      </ul>
+    </div>
+    </div>
+  </div>
 </header>
 
 {% block body %}{% endblock %}
 
-<footer class="row column">
-  <p>&copy; 2016 - <a href="https://etienne.bruines.work/" target="_blank">Etienne Bruines</a> - All Rights Reserved</p>
+<footer class="row">
+  <p class="medium-4 medium-centered column">&copy; 2016 - <a href="https://etienne.bruines.work/" target="_blank">Etienne Bruines</a> - All Rights Reserved</p>
 </footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
