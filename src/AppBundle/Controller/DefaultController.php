@@ -49,6 +49,9 @@ class DefaultController extends Controller
         $em = $this->getDoctrine()->getManager();
         $skill = $em->getRepository("AppBundle:Skill")->find($skillId);
 
+        if (!$skill)
+            return $this->redirectToRoute('homepage');
+
         return $this->render('default/purchase.html.twig', [
             'skill' => $skill,
         ]);
@@ -61,6 +64,9 @@ class DefaultController extends Controller
     public function purchaseConfirmedAction($skillId) {
         $em = $this->getDoctrine()->getManager();
         $skill = $em->getRepository("AppBundle:Skill")->find($skillId);
+
+        if (!$skill)
+            return $this->redirectToRoute('homepage');
 
         $payment = PayPal::createPayment($skill->price, "Purchase of ".$skill->name);
 
