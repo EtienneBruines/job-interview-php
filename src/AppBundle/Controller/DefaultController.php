@@ -11,6 +11,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class DefaultController extends Controller
 {
+    private static $hardcodedSkills = array(
+        "HTML Knowledge" => 19.95,
+        "PHP Knowledge" => 9.95,
+        "Go Knowledge" => 29.50,
+        "CSS Knowledge" => 5.00,
+        "Kindness" => 49.99,
+    );
+
     /**
      * @Route("/", name="homepage")
      */
@@ -18,6 +26,9 @@ class DefaultController extends Controller
     {
         $em = $this->getDoctrine()->getManager();
         $skills = $em->getRepository("AppBundle:Skill")->findAll();
+
+        if (!$skills || count($skills) != count(self::$hardcodedSkills))
+            return $this->redirectToRoute('init');
 
         // replace this example code with whatever you need
         return $this->render('default/index.html.twig', [
@@ -30,12 +41,22 @@ class DefaultController extends Controller
      */
     public function initAction()
     {
-        $skill = new Skill();
-        $skill->setName('HTML Knowledge');
-        $skill->setPrice(19.95);
-
         $em = $this->getDoctrine()->getManager();
-        $em->persist($skill);
+        foreach (self::$hardcodedSkills as $name => $price)
+        {
+            $exists = $em->getRepository("AppBundle:Skill")->findOneBy(array(
+                'name' => $name,
+            ));
+
+            if ($exists)
+                continue;
+
+            $skill = new Skill();
+            $skill->name = $name;
+            $skill->price = $price;
+            $em->persist($skill);
+        }
+
         $em->flush();
 
         return $this->redirectToRoute('homepage');
