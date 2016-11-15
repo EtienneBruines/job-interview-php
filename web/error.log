@@ -1,0 +1,1 @@
+15/Nov/2016:14:54:28 +0100 [ERROR 502 /app_dev.php/purchase/1] write tcp [::1]:2017->[::1]:51970: write: broken pipe

@@ -5,17 +5,13 @@
   <div class="medium-4 medium-centered column">
     <div class="callout primary">
       <h2>Purchasing: <br><small>{{ skill.name }}</small></h2>
-      <p>This will cost you &euro; {{ skill.price }}</p>
+      <p>This will cost you &euro; {{ skill.price }} <br><small>(if this weren't a sandbox-mode).</small></p>
       <form method="post">
         <input type="hidden" name="skillId" value="{{ skill.id }}">
         <input type="submit" value="Continue to PayPal" class="button expanded">
       </form>
-      {{ token }}
+      {{ redirectUrl }}
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block css %}
-
 {% endblock %}

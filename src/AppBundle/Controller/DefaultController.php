@@ -57,6 +57,7 @@ class DefaultController extends Controller
         return $this->render('default/purchase.html.twig', [
             'skill' => $skill,
             'token' => $token,
+            'redirectUrl' => '',
         ]);
     }
 
@@ -67,8 +68,9 @@ class DefaultController extends Controller
     public function purchaseConfirmedAction($skillId) {
         $em = $this->getDoctrine()->getManager();
         $skill = $em->getRepository("AppBundle:Skill")->find($skillId);
-        return $this->render('default/purchase.html.twig', [
-            'skill' => $skill,
-        ]);
+
+        $payment = PayPal::createPayment("19.95", "test");
+
+        return $this->redirect($payment->redirectUrl);
     }
 }
