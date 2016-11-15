@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\PayPal;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -47,8 +48,15 @@ class DefaultController extends Controller
     public function purchaseAction($skillId) {
         $em = $this->getDoctrine()->getManager();
         $skill = $em->getRepository("AppBundle:Skill")->find($skillId);
+
+        $token = PayPal::getToken();
+
+        $logger = $this->get('logger');
+        $logger->info('token is: '.$token);
+
         return $this->render('default/purchase.html.twig', [
             'skill' => $skill,
+            'token' => $token,
         ]);
     }
 
