@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="row">
+  <div class="medium-centered column">
+    <div class="callout primary">
+      <h2>Purchase History</h2>
+      <table>
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Date</th>
+          <th>State</th>
+          <th>Total</th>
+          <th>SkillId</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for payment in payments %}
+        <tr>
+          <td>
+            {% if payment.state == 'created' %}
+              <a target="_blank" href="{{ payment.redirectUrl }}">{{ payment.paypalId }}</a>
+            {% else %}
+              {{ payment.paypalId }}
+            {% endif %}
+          </td>
+          <td>{{ payment.timeUpdated.format('Y-m-d H:i:s') }}</td>
+          <td>{{ payment.state }}</td>
+          <td>&euro; {{ payment.total }}</td>
+          <td>{{ payment.skillId }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

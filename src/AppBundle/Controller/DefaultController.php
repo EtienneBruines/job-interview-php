@@ -127,4 +127,17 @@ class DefaultController extends Controller
             'token' => $token,
         ]);
     }
+
+    /**
+     * @Route("/purchase-history", name="purchase-history")
+     */
+    public function purchaseHistoryAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        $payments = $em->getRepository("AppBundle:Payment")->findAll();
+
+        return $this->render('default/purchase-history.html.twig', [
+            'payments' => $payments,
+        ]);
+    }
 }

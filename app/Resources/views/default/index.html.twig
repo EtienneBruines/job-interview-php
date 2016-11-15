@@ -17,7 +17,7 @@
         <tr>
           <td>{{ skill.name }}</td>
           <td>&euro; {{ skill.price }}</td>
-          <td><a href="{{ path('purchase', {'skillId': skill.id}) }}" class="button success">Buy!</a></td>
+          <td><a href="{{ path('purchase', {'skillId': skill.id}) }}" class="button primary expanded"><i class="fi-shopping-cart"></i> Buy!</a></td>
         </tr>
       {% endfor %}
       </tbody>
