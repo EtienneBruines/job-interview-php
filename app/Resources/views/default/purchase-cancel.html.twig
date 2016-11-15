@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="row">
+  <div class="medium-4 medium-centered column">
+    <div class="callout primary">
+      <h2>Payment failed</h2>
+      <p>Please <a href="https://www.sandbox.paypal.com/webscr?cmd=_express-checkout&token={{ token }}">try again</a>.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

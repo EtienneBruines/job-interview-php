@@ -3,11 +3,11 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\PayPal;
+use AppBundle\Entity\Skill;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Entity\Skill;
 
 class DefaultController extends Controller
 {
@@ -97,8 +97,11 @@ class DefaultController extends Controller
             throw new \Exception("Payment not found");
 
         if ($payment->state == "created")
+        {
             PayPal::executePayment($payment, $payerId);
-
+            $em->persist($payment);
+            $em->flush();
+        }
         $skill = $em->getRepository("AppBundle:Skill")->find($payment->skillId);
 
         if (!$skill)
@@ -107,6 +110,21 @@ class DefaultController extends Controller
         return $this->render('default/purchase-success.html.twig', [
             'skill' => $skill,
             'state' => $payment->state,
+        ]);
+    }
+
+    /**
+     * @Route("/purchase-cancel", name="purchase-cancel")
+     */
+    public function purchaseCancelAction(Request $request)
+    {
+        $token = $request->get('token');
+
+        if (!$token)
+            throw new \Exception("token was not set");
+
+        return $this->render('default/purchase-cancel.html.twig', [
+            'token' => $token,
         ]);
     }
 }
