@@ -49,15 +49,8 @@ class DefaultController extends Controller
         $em = $this->getDoctrine()->getManager();
         $skill = $em->getRepository("AppBundle:Skill")->find($skillId);
 
-        $token = PayPal::getToken();
-
-        $logger = $this->get('logger');
-        $logger->info('token is: '.$token);
-
         return $this->render('default/purchase.html.twig', [
             'skill' => $skill,
-            'token' => $token,
-            'redirectUrl' => '',
         ]);
     }
 
@@ -69,7 +62,7 @@ class DefaultController extends Controller
         $em = $this->getDoctrine()->getManager();
         $skill = $em->getRepository("AppBundle:Skill")->find($skillId);
 
-        $payment = PayPal::createPayment("19.95", "test");
+        $payment = PayPal::createPayment($skill->price, "Purchase of ".$skill->name);
 
         return $this->redirect($payment->redirectUrl);
     }
