@@ -70,6 +70,7 @@ class PayPal
     /**
      * Creates a payment in the PayPal environment
      *
+     * @param $skillId int The unique id of the skill to purchase
      * @param $amount float The total amount on this payment
      * @param $desc string The description as displayed to the user
      *
@@ -77,9 +78,9 @@ class PayPal
      *
      * @return Payment The payment with PayPal-specific information
      */
-    public static function createPayment($amount, $desc) {
+    public static function createPayment($skillId, $amount, $desc) {
         $token = self::getToken();
-        
+
         $req = curl_init(self::$baseUrl."payments/payment");
         $headers = array(
             "Accept: application/json",
@@ -90,8 +91,8 @@ class PayPal
         $body = array(
             "intent" => "sale",
             "redirect_urls" => array(
-                "return_url" => "http://localhost:2017/payment-success",
-                "cancel_url" => "http://localhost:2017/payment-cancel",
+                "return_url" => "http://localhost:2017/app_dev.php/purchase-success",
+                "cancel_url" => "http://localhost:2017/app_dev.php/purchase-cancel",
             ),
             "payer" => array(
                 "payment_method" => "paypal",
@@ -121,6 +122,7 @@ class PayPal
                 case 201:  # Created
                     break;
                 default:
+                    var_dump($result);
                     throw new \Exception("unable to request payment: HTTP error ".$http_code);
             }
         }
@@ -129,19 +131,70 @@ class PayPal
         curl_close($req);
 
         $payment = new Payment();
+        $payment->total = $amount;
+        $payment->skillId = $skillId;
         $payment->paypalId = $response['id'];
         $payment->state = $response['state'];
-        $payment->timeCreated = $response['create_time'];
-        //$payment->timeUpdated = $response['update_time'];
+        $payment->timeCreated = date_create_from_format("Y-m-d?G:i:s*", $response['create_time']);
+        if (in_array('update_time', $response))
+            $payment->timeUpdated = date_create_from_format("Y-m-d?G:i:s*", $response['update_time']);
+         else
+            $payment->timeUpdated = $payment->timeCreated;
 
         foreach ($response['links'] as $link)
         {
-            if ($link["method"] == "REDIRECT")
+            switch ($link["rel"])
             {
-                $payment->redirectUrl = $link["href"];
-                break;
+                case "approval_url":
+                    $payment->redirectUrl = $link["href"];
+                    break;
+                case "execute":
+                    $payment->executeUrl = $link["href"];
+                    break;
             }
         }
+
+        return $payment;
+    }
+
+    public static function executePayment($payment, $payerId) {
+        $token = self::getToken();
+
+        $req = curl_init($payment->executeUrl);
+        $headers = array(
+            "Accept: application/json",
+            "Authorization: Bearer $token",
+            "Content-Type: application/json",
+        );
+
+        $body = array(
+            "payer_id" => $payerId,
+        );
+
+        $json =  json_encode($body);
+
+        curl_setopt($req, CURLOPT_HEADER, false);
+        curl_setopt($req, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($req, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($req, CURLOPT_POST, true);
+        curl_setopt($req, CURLOPT_POSTFIELDS, $json);
+        $result = curl_exec($req);
+
+        if (!curl_errno($req)) {
+            switch ($http_code = curl_getinfo($req, CURLINFO_HTTP_CODE)) {
+                case 200:  # OK
+                    break;
+                case 201:  # Created
+                    break;
+                default:
+                    throw new \Exception("unable to request payment: HTTP error ".$http_code);
+            }
+        }
+
+        $response = json_decode($result, true);
+        curl_close($req);
+
+        $payment->state = $response['state'];
 
         return $payment;
     }

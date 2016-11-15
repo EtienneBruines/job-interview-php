@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\OneToOne;
 
 /**
  * @ORM\Entity
@@ -41,4 +42,20 @@ class Payment
      * @ORM\Column(type="string", length=86)
      */
     public $redirectUrl;
+
+    /**
+     * @ORM\Column(type="string", length=87)
+     */
+    public $executeUrl;
+
+    /**
+     * @ORM\Column(type="integer")
+     * @OneToOne(targetEntity="skill")
+     */
+    public $skillId;
+
+    /**
+     * @ORM\Column(type="decimal")
+     */
+    public $total;
 }

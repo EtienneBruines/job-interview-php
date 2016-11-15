@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="row">
+  <div class="medium-4 medium-centered column">
+    <div class="callout primary">
+      <h2>Purchased: <br><small>{{ skill.name }}</small></h2>
+      <p>The payment state is now <strong>{{ state }}</strong>.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

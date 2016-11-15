@@ -68,8 +68,45 @@ class DefaultController extends Controller
         if (!$skill)
             return $this->redirectToRoute('homepage');
 
-        $payment = PayPal::createPayment($skill->price, "Purchase of ".$skill->name);
+        $payment = PayPal::createPayment($skill->id, $skill->price, "Purchase of ".$skill->name);
+        $em->persist($payment);
+        $em->flush();
 
         return $this->redirect($payment->redirectUrl);
+    }
+
+    /**
+     * @Route("/purchase-success", name="purchase-success")
+     */
+    public function purchaseSuccessAction(Request $request) {
+        $paymentId = $request->get('paymentId');
+        $payerId = $request->get('PayerID');
+
+        if (!$paymentId)
+            throw new \Exception("paymentId was not set");
+
+        if (!$payerId)
+            throw new \Exception("payerId was not set");
+
+        $em = $this->getDoctrine()->getManager();
+        $payment = $em->getRepository("AppBundle:Payment")->findOneBy(array(
+            'paypalId' => $paymentId,
+        ));
+
+        if (!$payment)
+            throw new \Exception("Payment not found");
+
+        if ($payment->state == "created")
+            PayPal::executePayment($payment, $payerId);
+
+        $skill = $em->getRepository("AppBundle:Skill")->find($payment->skillId);
+
+        if (!$skill)
+            throw new \Exception("Skill not found");
+
+        return $this->render('default/purchase-success.html.twig', [
+            'skill' => $skill,
+            'state' => $payment->state,
+        ]);
     }
 }
